@@ -1,0 +1,20 @@
+{
+    "name": "admin/app",
+    "autoload": {
+        "psr-4": {
+            "Admin\\App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Y Pak Ayun",
+            "email": "pakcloudy@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.6",
+        "jenssegers/blade": "1.4.*"
+    }
+}
+
+
