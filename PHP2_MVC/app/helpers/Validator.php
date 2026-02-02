@@ -85,17 +85,23 @@ class Validator
     {
         if (!empty($this->data[$field])) {
             $conn = Database::connect();
-            $sql = "SELECT COUNT(*) FROM {$table} WHERE {$field} = :{$field}";
             
             if ($excludeId) {
-                $sql .= " AND id != :id";
+                // Khi update, loại trừ ID hiện tại
+                $sql = "SELECT COUNT(*) FROM {$table} WHERE {$field} = :{$field} AND id != :id";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    $field => $this->data[$field],
+                    'id' => $excludeId
+                ]);
+            } else {
+                // Khi tạo mới, chỉ kiểm tra field
+                $sql = "SELECT COUNT(*) FROM {$table} WHERE {$field} = :{$field}";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    $field => $this->data[$field]
+                ]);
             }
-            
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                $field => $this->data[$field],
-                'id' => $excludeId
-            ]);
             
             if ($stmt->fetchColumn() > 0) {
                 $this->errors[$field] = ucfirst($field) . " đã tồn tại";

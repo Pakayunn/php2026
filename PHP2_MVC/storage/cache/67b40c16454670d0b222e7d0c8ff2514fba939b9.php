@@ -1,8 +1,8 @@
-@extends('layouts.master')
 
-@section('title', 'Quản lý danh mục')
 
-@section('content')
+<?php $__env->startSection('title', 'Quản lý danh mục'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid">
     <div class="row mb-3">
         <div class="col-md-6">
@@ -28,34 +28,34 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if(!empty($categories) && count($categories) > 0)
-                            @foreach($categories as $category)
+                        <?php if(!empty($categories) && count($categories) > 0): ?>
+                            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <tr>
-                                <td>{{ $category['id'] }}</td>
-                                <td>{{ $category['name'] }}</td>
-                                <td>{{ $category['description'] ?? 'N/A' }}</td>
+                                <td><?php echo e($category['id']); ?></td>
+                                <td><?php echo e($category['name']); ?></td>
+                                <td><?php echo e($category['description'] ?? 'N/A'); ?></td>
                                 <td>
-                                    <a href="/category/edit/{{ $category['id'] }}" 
+                                    <a href="/category/edit/<?php echo e($category['id']); ?>" 
                                        class="btn btn-sm btn-warning" 
                                        title="Sửa">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button onclick="deleteCategory({{ $category['id'] }})" 
+                                    <button onclick="deleteCategory(<?php echo e($category['id']); ?>)" 
                                             class="btn btn-sm btn-danger" 
                                             title="Xóa">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
-                            @endforeach
-                        @else
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php else: ?>
                             <tr>
                                 <td colspan="4" class="text-center">
                                     <i class="fas fa-inbox fa-3x text-muted mb-3 d-block"></i>
                                     <p class="text-muted">Chưa có danh mục nào</p>
                                 </td>
                             </tr>
-                        @endif
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -103,4 +103,5 @@ function deleteCategory(id) {
     });
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Xamppp2\htdocs\Php2\PHP2_MVC\app\views/category/index.blade.php ENDPATH**/ ?>

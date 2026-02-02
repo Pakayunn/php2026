@@ -34,7 +34,7 @@ class Brand extends Model
         ]);
     }
 
-    public function update($data = [], $id)
+    public function update($id, $data = [])
     {
         $sql = "UPDATE {$this->table} SET name = :name, logo = :logo, description = :description WHERE id = :id";
         $conn = $this->connect();
@@ -51,7 +51,7 @@ class Brand extends Model
     {
         // Lấy thông tin brand để xóa logo
         $brand = $this->find($id);
-        
+
         // Xóa file logo nếu có
         if ($brand && !empty($brand['logo'])) {
             $logoPath = BASE_PATH . '/public/uploads/brands/' . $brand['logo'];
@@ -59,7 +59,7 @@ class Brand extends Model
                 unlink($logoPath);
             }
         }
-        
+
         $sql = "DELETE FROM {$this->table} WHERE id = :id";
         $conn = $this->connect();
         $stmt = $conn->prepare($sql);

@@ -81,7 +81,7 @@ class Product extends Model
     /**
      * Cập nhật sản phẩm
      */
-    public function update($data = [], $id)
+    public function update($id, $data = [])
     {
         $sql = "UPDATE {$this->table} 
                 SET name = :name, 

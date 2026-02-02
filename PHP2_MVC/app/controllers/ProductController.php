@@ -61,6 +61,12 @@ class ProductController extends Controller
         $imageName = null;
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = BASE_PATH . '/public/uploads/products/';
+            
+            // Tạo thư mục nếu chưa có
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            
             $upload = new Upload($uploadDir);
             $upload->setAllowedTypes(['jpg', 'jpeg', 'png'])
                    ->setMaxSize(2097152); // 2MB
@@ -89,11 +95,13 @@ class ProductController extends Controller
 
         if ($productModel->create($data)) {
             $_SESSION['success'] = 'Thêm sản phẩm thành công!';
+            $this->redirect('/product');
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra khi thêm sản phẩm!';
+            $this->redirect('/product');
         }
 
-        $this->redirect('/product');
+        
     }
 
     /**
@@ -140,7 +148,6 @@ class ProductController extends Controller
             return;
         }
 
-        // Validate dữ liệu
         $validator = new Validator($_POST);
         $validator->required(['name', 'price', 'category_id', 'brand_id'])
                   ->min('name', 3)
@@ -156,17 +163,21 @@ class ProductController extends Controller
             return;
         }
 
-        // Xử lý upload ảnh mới
-        $imageName = $product['image']; // Giữ ảnh cũ
-        
+        $imageName = $product['image'];
+
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = BASE_PATH . '/public/uploads/products/';
+
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
             $upload = new Upload($uploadDir);
             $upload->setAllowedTypes(['jpg', 'jpeg', 'png'])
-                   ->setMaxSize(2097152); // 2MB
+                   ->setMaxSize(2097152);
 
             $newImage = $upload->upload($_FILES['image']);
-            
+
             if ($upload->hasErrors()) {
                 $_SESSION['errors']['image'] = $upload->firstError();
                 $_SESSION['old'] = $_POST;
@@ -174,7 +185,6 @@ class ProductController extends Controller
                 return;
             }
 
-            // Xóa ảnh cũ
             if (!empty($product['image'])) {
                 $oldImagePath = $uploadDir . $product['image'];
                 if (file_exists($oldImagePath)) {
@@ -185,7 +195,6 @@ class ProductController extends Controller
             $imageName = $newImage;
         }
 
-        // Cập nhật database
         $data = [
             'name' => $_POST['name'],
             'price' => $_POST['price'],
@@ -196,7 +205,7 @@ class ProductController extends Controller
             'stock' => $_POST['stock'] ?? 0
         ];
 
-        if ($productModel->update($data, $id)) {
+        if ($productModel->update($id, $data)) {
             $_SESSION['success'] = 'Cập nhật sản phẩm thành công!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra khi cập nhật sản phẩm!';
@@ -206,7 +215,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Xóa sản phẩm
+     * Xóa sản phẩm (AJAX)
      */
     public function delete($id)
     {

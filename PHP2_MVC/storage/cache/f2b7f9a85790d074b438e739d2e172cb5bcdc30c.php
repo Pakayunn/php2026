@@ -1,8 +1,8 @@
-@extends('layouts.master')
 
-@section('title', 'Thêm danh mục mới')
 
-@section('content')
+<?php $__env->startSection('title', 'Thêm danh mục mới'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid">
     <div class="row mb-3">
         <div class="col-12">
@@ -76,4 +76,5 @@ document.getElementById('categoryForm').addEventListener('submit', function(e) {
     }
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Xamppp2\htdocs\Php2\PHP2_MVC\app\views/category/create.blade.php ENDPATH**/ ?>

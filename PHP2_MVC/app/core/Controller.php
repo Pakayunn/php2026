@@ -2,20 +2,16 @@
 
 // use Jenssegers\Blade\Blade;
 
-
 // class Controller
 // {
 //     public function view(string $view, array $data = []): void
 //     {
-//         // Chuẩn hoá về dạng dot: "home/index" -> "home.index"
 //         $normalizedView = $this->normalizeViewName($view);
-
-//         // Map sang đường dẫn file để kiểm tra tồn tại
 //         $viewPath = str_replace('.', '/', $normalizedView);
 
 //         $candidates = [
 //             Views_PATH . '/' . $viewPath . '.blade.php',
-//             Views_PATH . '/' . $viewPath . '.blade', // nếu bạn thật sự có kiểu file này
+//             Views_PATH . '/' . $viewPath . '.blade',
 //         ];
 
 //         $found = null;
@@ -30,14 +26,12 @@
 //             throw new RuntimeException("Blade view not found: {$view} (resolved: {$viewPath})");
 //         }
 
-//         $cachePath = BASE_PATH . '/PHP2_MVC/storage/cache';
+//         $cachePath = BASE_PATH . '/storage/cache';
 //         if (!is_dir($cachePath) && !mkdir($cachePath, 0775, true) && !is_dir($cachePath)) {
 //             throw new RuntimeException("Cannot create cache directory: {$cachePath}");
 //         }
 
-//         // Quan trọng: truyền THƯ MỤC views, không truyền $viewPath
 //         $blade = new Blade(Views_PATH, $cachePath);
-
 //         echo $blade->render($normalizedView, $data);
 //     }
 
@@ -48,37 +42,44 @@
 //         $view = preg_replace('/\.+/', '.', $view);
 //         return trim($view, '.');
 //     }
-    
+
 //     public function model($name)
 //     {
 //         $class = ucfirst($name);
 //         if (!class_exists($class)) {
-//             throw new Exception("class not found");
+//             throw new Exception("Model class not found: {$class}");
 //         }
 //         return new $class();
 //     }
 
+//     /**
+//      * Redirect — dùng dirname(SCRIPT_NAME) giống Router.basePath()
+//      * .htaccess rewrite set SCRIPT_NAME = /Php2/PHP2_MVC/app/Public/index.php
+//      * base = /Php2/PHP2_MVC/app/Public
+//      * target = /Php2/PHP2_MVC/app/Public/product
+//      */
 //     public function redirect($path)
 //     {
-//         $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
+//         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+//         $base = rtrim(dirname($scriptName), '/');
+
 //         $target = $base . '/' . ltrim($path, '/');
 //         header('Location: ' . $target);
 //         exit;
 //     }
 
+//     protected function baseUrl()
+//     {
+//         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+//         return rtrim(dirname($scriptName), '/');
+//     }
+
 //     public function notFound($message): void
 //     {
 //         http_response_code(404);
-//         /**
-//          * sau nay co the load theo view errors
-//          */
-//         echo "controller Not Found - ' . $message. </h1>";
+//         echo "<h1>Controller Not Found - {$message}</h1>";
 //     }
 // }
-
-
-
-
 
 use Jenssegers\Blade\Blade;
 
@@ -86,10 +87,7 @@ class Controller
 {
     public function view(string $view, array $data = []): void
     {
-        // Chuẩn hoá về dạng dot: "home/index" -> "home.index"
         $normalizedView = $this->normalizeViewName($view);
-
-        // Map sang đường dẫn file để kiểm tra tồn tại
         $viewPath = str_replace('.', '/', $normalizedView);
 
         $candidates = [
@@ -109,13 +107,12 @@ class Controller
             throw new RuntimeException("Blade view not found: {$view} (resolved: {$viewPath})");
         }
 
-        $cachePath = BASE_PATH . '/PHP2_MVC/storage/cache';
+        $cachePath = BASE_PATH . '/storage/cache';
         if (!is_dir($cachePath) && !mkdir($cachePath, 0775, true) && !is_dir($cachePath)) {
             throw new RuntimeException("Cannot create cache directory: {$cachePath}");
         }
 
         $blade = new Blade(Views_PATH, $cachePath);
-
         echo $blade->render($normalizedView, $data);
     }
 
@@ -126,22 +123,43 @@ class Controller
         $view = preg_replace('/\.+/', '.', $view);
         return trim($view, '.');
     }
-    
+
     public function model($name)
     {
         $class = ucfirst($name);
         if (!class_exists($class)) {
-            throw new Exception("class not found");
+            throw new Exception("Model class not found: {$class}");
         }
         return new $class();
     }
 
+    /**
+     * Redirect với URL tuyệt đối
+     * Sử dụng protocol + host + base path để tạo URL đầy đủ
+     */
     public function redirect($path)
     {
-        $base = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/');
-        $target = $base . '/' . ltrim($path, '/');
-        header('Location: ' . $target);
+        // Lấy protocol (http hoặc https)
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        
+        // Lấy host
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        
+        // Lấy base path từ SCRIPT_NAME
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+        $base = rtrim(dirname($scriptName), '/');
+        
+        // Tạo URL tuyệt đối
+        $url = $protocol . '://' . $host . $base . '/' . ltrim($path, '/');
+        
+        header('Location: ' . $url);
         exit;
+    }
+
+    protected function baseUrl()
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
+        return rtrim(dirname($scriptName), '/');
     }
 
     public function notFound($message): void

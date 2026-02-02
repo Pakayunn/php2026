@@ -33,7 +33,7 @@ class Category extends Model
         ]);
     }
 
-    public function update($data = [], $id)
+    public function update($id, $data = [])
     {
         $sql = "UPDATE {$this->table} SET name = :name, description = :description WHERE id = :id";
         $conn = $this->connect();

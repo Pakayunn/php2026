@@ -40,7 +40,7 @@ class User extends Model
         ]);
     }
 
-    public function update($data = [], $id)
+    public function update($id, $data = [])
     {
         // Nếu có password mới thì hash, không thì giữ nguyên
         if (!empty($data['password'])) {

@@ -1,16 +1,16 @@
 @extends('layouts.master')
 
-@section('title', 'Thêm danh mục mới')
+@section('title', 'Sửa danh mục')
 
 @section('content')
 <div class="container-fluid">
     <div class="row mb-3">
         <div class="col-12">
-            <h2><i class="fas fa-plus-circle"></i> Thêm danh mục mới</h2>
+            <h2><i class="fas fa-edit"></i> Sửa danh mục</h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/category">Danh mục</a></li>
-                    <li class="breadcrumb-item active">Thêm mới</li>
+                    <li class="breadcrumb-item active">Sửa</li>
                 </ol>
             </nav>
         </div>
@@ -18,31 +18,28 @@
 
     <div class="card shadow">
         <div class="card-body">
-            <form action="/category/store" method="POST" id="categoryForm">
+            <form action="/category/update/{{ $category['id'] }}" method="POST" id="categoryForm">
                 <div class="row">
-                    <!-- Tên danh mục -->
                     <div class="col-md-12 mb-3">
                         <label for="name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
                         <input type="text" 
                                class="form-control <?php echo isset($_SESSION['errors']['name']) ? 'is-invalid' : ''; ?>" 
                                id="name" 
                                name="name" 
-                               value="<?php echo $_SESSION['old']['name'] ?? ''; ?>"
+                               value="<?php echo $_SESSION['old']['name'] ?? $category['name']; ?>"
                                required
-                               minlength="3"
-                               maxlength="255">
+                               minlength="3">
                         <?php if(isset($_SESSION['errors']['name'])): ?>
                             <div class="invalid-feedback"><?php echo $_SESSION['errors']['name']; ?></div>
                         <?php endif; ?>
                     </div>
 
-                    <!-- Mô tả -->
                     <div class="col-12 mb-3">
                         <label for="description" class="form-label">Mô tả danh mục</label>
                         <textarea class="form-control" 
                                   id="description" 
                                   name="description" 
-                                  rows="4"><?php echo $_SESSION['old']['description'] ?? ''; ?></textarea>
+                                  rows="4"><?php echo $_SESSION['old']['description'] ?? $category['description']; ?></textarea>
                     </div>
                 </div>
 
@@ -51,7 +48,7 @@
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Lưu danh mục
+                        <i class="fas fa-save"></i> Cập nhật
                     </button>
                 </div>
             </form>
@@ -59,13 +56,9 @@
     </div>
 </div>
 
-<?php 
-// Clear old input and errors
-unset($_SESSION['old'], $_SESSION['errors']);
-?>
+<?php unset($_SESSION['old'], $_SESSION['errors']); ?>
 
 <script>
-// Form validation
 document.getElementById('categoryForm').addEventListener('submit', function(e) {
     const name = document.getElementById('name').value.trim();
     
