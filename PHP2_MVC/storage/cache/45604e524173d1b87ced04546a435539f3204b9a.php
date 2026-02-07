@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'PHP2 MVC')</title>
+    <title><?php echo $__env->yieldContent('title', 'PHP2 MVC'); ?></title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -140,18 +140,19 @@ body {
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
 
-                        @php
+                        <?php
                             $user = $_SESSION['user'] ?? null;
-                        @endphp
+                        ?>
 
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i>
-                            {{ $user['username'] ?? 'Tài khoản' }}
+                            <?php echo e($user['username'] ?? 'Tài khoản'); ?>
+
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-end">
 
-                            @if(!$user)
+                            <?php if(!$user): ?>
                                 <li>
                                     <a class="dropdown-item" href="/auth/login">
                                         <i class="fas fa-sign-in"></i> Đăng nhập
@@ -164,15 +165,15 @@ body {
                                     </a>
                                 </li>
 
-                            @else
+                            <?php else: ?>
 
-                                @if($user['role'] === 'admin')
+                                <?php if($user['role'] === 'admin'): ?>
                                     <li>
                                         <a class="dropdown-item" href="/admin/dashboard">
                                             <i class="fas fa-tachometer-alt"></i> Trang Admin
                                         </a>
                                     </li>
-                                @endif
+                                <?php endif; ?>
 
                                 <li>
                                     <a class="dropdown-item" href="/auth/logout">
@@ -180,7 +181,7 @@ body {
                                     </a>
                                 </li>
 
-                            @endif
+                            <?php endif; ?>
 
                         </ul>
                     </li>
@@ -193,60 +194,62 @@ body {
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar (chỉ hiện khi ở trang admin) -->
-            @if(
+            <?php if(
                     strpos($_SERVER['REQUEST_URI'] ?? '', '/admin') !== false ||
                     strpos($_SERVER['REQUEST_URI'] ?? '', '/product') !== false ||
                     strpos($_SERVER['REQUEST_URI'] ?? '', '/category') !== false ||
                     strpos($_SERVER['REQUEST_URI'] ?? '', '/brand') !== false ||
                     strpos($_SERVER['REQUEST_URI'] ?? '', '/user') !== false
-                )
+                ): ?>
                 <div class="col-md-2 p-0 sidebar">
                     <nav class="nav flex-column mt-3">
-                        <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/admin') !== false ? 'active' : '' }}"
+                        <a class="nav-link <?php echo e(strpos($_SERVER['REQUEST_URI'], '/admin') !== false ? 'active' : ''); ?>"
                             href="/admin">
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
-                        <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/product') !== false ? 'active' : '' }}"
+                        <a class="nav-link <?php echo e(strpos($_SERVER['REQUEST_URI'], '/product') !== false ? 'active' : ''); ?>"
                             href="/product">
                             <i class="fas fa-box"></i> Sản phẩm
                         </a>
-                        <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/category') !== false ? 'active' : '' }}"
+                        <a class="nav-link <?php echo e(strpos($_SERVER['REQUEST_URI'], '/category') !== false ? 'active' : ''); ?>"
                             href="/category">
                             <i class="fas fa-list"></i> Danh mục
                         </a>
-                        <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/brand') !== false ? 'active' : '' }}"
+                        <a class="nav-link <?php echo e(strpos($_SERVER['REQUEST_URI'], '/brand') !== false ? 'active' : ''); ?>"
                             href="/brand">
                             <i class="fas fa-tags"></i> Thương hiệu
                         </a>
-                        <a class="nav-link {{ strpos($_SERVER['REQUEST_URI'], '/user') !== false ? 'active' : '' }}"
+                        <a class="nav-link <?php echo e(strpos($_SERVER['REQUEST_URI'], '/user') !== false ? 'active' : ''); ?>"
                             href="/user">
                             <i class="fas fa-users"></i> Người dùng
                         </a>
                     </nav>
                 </div>
                 <div class="col-md-10 main-content">
-            @else
+            <?php else: ?>
                     <div class="col-12 main-content">
-                @endif
+                <?php endif; ?>
                     <!-- Flash Messages -->
-                    @if(isset($_SESSION['success']))
+                    <?php if(isset($_SESSION['success'])): ?>
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle"></i> {{ $_SESSION['success'] }}
+                            <i class="fas fa-check-circle"></i> <?php echo e($_SESSION['success']); ?>
+
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                         <?php    unset($_SESSION['success']); ?>
-                    @endif
+                    <?php endif; ?>
 
-                    @if(isset($_SESSION['error']))
+                    <?php if(isset($_SESSION['error'])): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-circle"></i> {{ $_SESSION['error'] }}
+                            <i class="fas fa-exclamation-circle"></i> <?php echo e($_SESSION['error']); ?>
+
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                         <?php    unset($_SESSION['error']); ?>
-                    @endif
+                    <?php endif; ?>
 
                     <!-- Main Content -->
-                    @yield('content')
+                    <?php echo $__env->yieldContent('content'); ?>
                 </div>
             </div>
         </div>
@@ -266,7 +269,7 @@ body {
         <!-- Custom Admin JS -->
         <script src="/js/admin.js"></script>
 
-        @yield('scripts')
+        <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 
-</html>
+</html><?php /**PATH C:\Xamppp2\htdocs\hihi\php2026\PHP2_MVC\app\views/layouts/master.blade.php ENDPATH**/ ?>

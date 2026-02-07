@@ -105,4 +105,11 @@ class AdminController extends Controller
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function dashboard()
+{
+    Auth::checkAdmin();
+
+    return $this->view('admin.dashboard');
+}
+
 }

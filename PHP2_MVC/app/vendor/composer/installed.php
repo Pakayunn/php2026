@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'admin/app',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '8b0d81e217eeb386190d3fe8ee76e87bf6e6247e',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'admin/app' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '8b0d81e217eeb386190d3fe8ee76e87bf6e6247e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -248,9 +248,9 @@
             'dev_requirement' => false,
         ),
         'symfony/translation' => array(
-            'pretty_version' => 'v6.4.31',
-            'version' => '6.4.31.0',
-            'reference' => '81579408ecf7dc5aa2d8462a6d5c3a430a80e6f2',
+            'pretty_version' => 'v6.4.32',
+            'version' => '6.4.32.0',
+            'reference' => 'd6cc8e2fdd484f2f41d25938b0e8e3915de3cfbc',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/translation',
             'aliases' => array(),

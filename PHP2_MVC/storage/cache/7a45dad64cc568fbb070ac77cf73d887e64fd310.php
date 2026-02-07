@@ -11,9 +11,9 @@
 
 <body class="bg-light">
 
-@php
+<?php
     $user = $_SESSION['user'] ?? null;
-@endphp
+?>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
@@ -38,12 +38,13 @@
 
 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
     <i class="fas fa-user"></i>
-    {{ $user['username'] ?? 'Tài khoản' }}
+    <?php echo e($user['username'] ?? 'Tài khoản'); ?>
+
 </a>
 
 <ul class="dropdown-menu dropdown-menu-end">
 
-@if(!$user)
+<?php if(!$user): ?>
 
     <li>
         <a class="dropdown-item" href="/auth/login">
@@ -57,15 +58,15 @@
         </a>
     </li>
 
-@else
+<?php else: ?>
 
-    @if($user['role'] === 'admin')
+    <?php if($user['role'] === 'admin'): ?>
     <li>
         <a class="dropdown-item" href="/admin/dashboard">
             <i class="fas fa-tachometer-alt"></i> Dashboard
         </a>
     </li>
-    @endif
+    <?php endif; ?>
 
     <li>
         <a class="dropdown-item" href="/auth/logout">
@@ -73,7 +74,7 @@
         </a>
     </li>
 
-@endif
+<?php endif; ?>
 
 </ul>
 </li>
@@ -106,15 +107,15 @@
 
 <div class="row g-3">
 
-@for($i = 1; $i <= 6; $i++)
+<?php for($i = 1; $i <= 6; $i++): ?>
 
 <div class="col-12 col-sm-6 col-xl-4">
 <div class="card h-100 shadow-sm">
 
-<img src="https://picsum.photos/600/400?random={{ $i }}" class="card-img-top">
+<img src="https://picsum.photos/600/400?random=<?php echo e($i); ?>" class="card-img-top">
 
 <div class="card-body">
-<h5 class="card-title">Sản phẩm {{ $i }}</h5>
+<h5 class="card-title">Sản phẩm <?php echo e($i); ?></h5>
 
 <div class="d-flex justify-content-between">
     <div class="fw-semibold">$199</div>
@@ -125,7 +126,7 @@
 </div>
 </div>
 
-@endfor
+<?php endfor; ?>
 
 </div>
 </section>
@@ -143,3 +144,4 @@
 
 </body>
 </html>
+<?php /**PATH C:\Xamppp2\htdocs\hihi\php2026\PHP2_MVC\app\views/home/index.blade.php ENDPATH**/ ?>
