@@ -91,6 +91,8 @@
                 </button>
 
             </form>
+            <a href="/auth/forgot">Quên mật khẩu?</a>
+
 
             <div class="text-center mt-3">
                 <a class="text-decoration-none" href="{{ $baseUrl ?? '/auth/register' }}">

@@ -37,7 +37,7 @@ class ProductController extends Controller
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/product');
+            $this->redirect('product');
             return;
         }
 
@@ -95,10 +95,10 @@ class ProductController extends Controller
 
         if ($productModel->create($data)) {
             $_SESSION['success'] = 'Thêm sản phẩm thành công!';
-            $this->redirect('/product');
+            $this->redirect('product');
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra khi thêm sản phẩm!';
-            $this->redirect('/product');
+            $this->redirect('product');
         }
 
         
@@ -117,7 +117,7 @@ class ProductController extends Controller
         
         if (!$product) {
             $_SESSION['error'] = 'Không tìm thấy sản phẩm!';
-            $this->redirect('/product');
+            $this->redirect('product');
             return;
         }
 
@@ -135,7 +135,7 @@ class ProductController extends Controller
     public function update($id)
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/product');
+            $this->redirect('product');
             return;
         }
 
@@ -144,7 +144,7 @@ class ProductController extends Controller
 
         if (!$product) {
             $_SESSION['error'] = 'Không tìm thấy sản phẩm!';
-            $this->redirect('/product');
+            $this->redirect('product');
             return;
         }
 
@@ -211,7 +211,7 @@ class ProductController extends Controller
             $_SESSION['error'] = 'Có lỗi xảy ra khi cập nhật sản phẩm!';
         }
 
-        $this->redirect('/product');
+        $this->redirect('product');
     }
 
     /**

@@ -1,27 +1,10 @@
 <?php
 
-// class AuthController
-// {
-//     public function login()
-//     {
-//         $error = null;
-//         require Views_PATH . '/auth/login.php';
-//     }
-
-//     public function register()
-//     {
-//         $error = null;
-//         require Views_PATH . '/auth/register.php';
-//     }
-// }
-
-
 class AuthController extends Controller
 {
     // /auth/login
     public function login()
     {
-        session_start();
         $error = null;
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -61,7 +44,6 @@ class AuthController extends Controller
     // /auth/register
     public function register()
     {
-        session_start();
         $error = null;
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -96,9 +78,51 @@ class AuthController extends Controller
     // /auth/logout
     public function logout()
     {
-        session_start();
         unset($_SESSION['user']);
 
         return $this->redirect('/auth/login');
     }
+   public function forgot()
+{
+    $error = null;
+    $success = null;
+
+    // Blade render
+    $this->view('auth.forgot', compact('error', 'success'));
+}
+
+public function forgotPost()
+{
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    if (!$email || !$password) {
+        $error = "Vui lòng nhập đầy đủ thông tin";
+        $this->view('auth.forgot', compact('error'));
+        return;
+    }
+
+    $userModel = new User();
+    $user = $userModel->findByEmail($email);
+
+    if (!$user) {
+        $error = "Email không tồn tại";
+        $this->view('auth.forgot', compact('error'));
+        return;
+    }
+
+    // cập nhật mật khẩu mới
+    $userModel->update($user['id'], [
+        'username'  => $user['username'],
+        'email'     => $user['email'],
+        'password'  => $password,
+        'full_name' => $user['full_name'],
+        'role'      => $user['role'],
+        'status'    => $user['status'],
+    ]);
+
+    $_SESSION['success'] = "Đã cập nhật mật khẩu mới, hãy đăng nhập";
+
+    $this->redirect('/auth/login');
+}
 }

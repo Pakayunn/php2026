@@ -23,7 +23,7 @@ class BrandController extends Controller
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->redirect('/brand');
+            $this->redirect('brand');
             return;
         }
 
@@ -35,7 +35,7 @@ class BrandController extends Controller
         if ($validator->fails()) {
             $_SESSION['errors'] = $validator->errors();
             $_SESSION['old'] = $_POST;
-            $this->redirect('/brand/create');
+            $this->redirect('brand/create');
             return;
         }
 
@@ -52,7 +52,7 @@ class BrandController extends Controller
             if ($upload->hasErrors()) {
                 $_SESSION['errors']['logo'] = $upload->firstError();
                 $_SESSION['old'] = $_POST;
-                $this->redirect('/brand/create');
+                $this->redirect('brand/create');
                 return;
             }
         }
@@ -70,7 +70,7 @@ class BrandController extends Controller
             $_SESSION['error'] = 'Có lỗi xảy ra!';
         }
 
-        $this->redirect('/brand');
+        $this->redirect('brand');
     }
 
     public function edit($id)
@@ -80,7 +80,7 @@ class BrandController extends Controller
         
         if (!$brand) {
             $_SESSION['error'] = 'Không tìm thấy thương hiệu!';
-            $this->redirect('/brand');
+            $this->redirect('brand');
             return;
         }
 

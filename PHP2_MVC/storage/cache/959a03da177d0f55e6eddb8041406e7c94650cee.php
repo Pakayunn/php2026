@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -93,6 +92,8 @@
                 </button>
 
             </form>
+            <a href="/auth/forgot">Quên mật khẩu?</a>
+
 
             <div class="text-center mt-3">
                 <a class="text-decoration-none" href="<?php echo e($baseUrl ?? '/auth/register'); ?>">

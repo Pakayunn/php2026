@@ -52,33 +52,13 @@ class Controller
         return new $class();
     }
 
-    /**
-     * Redirect với URL tuyệt đối
-     * Sử dụng protocol + host + base path để tạo URL đầy đủ
-     */public function redirect($path)
+public function redirect($path)
 {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
-        ? 'https' : 'http';
-
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '/index.php';
-    $base = rtrim(dirname($scriptName), '/');
-
-    // Xử lý không cho tạo ///
-    $path = '/' . ltrim($path, '/');
-
-    $url = $protocol . '://' . $host;
-
-    if ($base !== '') {
-        $url .= '/' . trim($base, '/');
-    }
-
-    $url .= $path;
-
-    header('Location: ' . $url);
+    $path = '/' . trim($path, '/');
+    header('Location: ' . $path);
     exit;
 }
+
 
 
     protected function baseUrl()
