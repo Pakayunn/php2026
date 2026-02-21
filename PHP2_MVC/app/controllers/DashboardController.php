@@ -1,10 +1,6 @@
-<?php
-
-class AdminController extends Controller
+<?php 
+class DashboardController extends Controller
 {
-    /**
-     * Dashboard admin - hiển thị thống kê tổng quan
-     */
     public function index()
     {
         // Lấy thống kê
@@ -25,9 +21,6 @@ class AdminController extends Controller
     private function getStatistics()
     {
         $productModel = $this->model('Product');
-        $categoryModel = $this->model('Category');
-        $brandModel = $this->model('Brand');
-        $userModel = $this->model('User');
 
         return [
             'totalProducts' => $this->countRecords('products'),
@@ -57,7 +50,6 @@ class AdminController extends Controller
         return [
             'productsByCategory' => $this->getProductsByCategory(),
             'productsByBrand' => $this->getProductsByBrand(),
-            'usersByRole' => $this->getUsersByRole(),
         ];
     }
 
@@ -73,7 +65,14 @@ class AdminController extends Controller
                 GROUP BY c.id, c.name";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Chuyển đổi sang format {name: total}
+        $data = [];
+        foreach ($results as $row) {
+            $data[$row['name']] = (int)$row['total'];
+        }
+        return $data;
     }
 
     /**
@@ -89,27 +88,14 @@ class AdminController extends Controller
                 LIMIT 10";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // Chuyển đổi sang format {name: total}
+        $data = [];
+        foreach ($results as $row) {
+            $data[$row['name']] = (int)$row['total'];
+        }
+        return $data;
     }
-
-    /**
-     * Thống kê người dùng theo vai trò
-     */
-    private function getUsersByRole()
-    {
-        $conn = Database::connect();
-        $sql = "SELECT role, COUNT(*) as total 
-                FROM users 
-                GROUP BY role";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function dashboard()
-    {
-        Auth::checkAdmin();
-        // Gọi index() để lấy dữ liệu thống kê
-        return $this->index();
-    }
-
 }
+?>

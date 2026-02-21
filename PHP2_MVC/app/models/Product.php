@@ -167,4 +167,71 @@ class Product extends Model
         $stmt->execute(['category_id' => $categoryId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Đếm tổng số sản phẩm
+     */
+    public function count()
+    {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table}";
+        $conn = $this->connect();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'] ?? 0;
+    }
+
+    /**
+     * Lấy các sản phẩm mới nhất (alias cho getRecent)
+     */
+    public function latest($limit = 5)
+    {
+        return $this->getRecent($limit);
+    }
+
+    /**
+     * Đếm sản phẩm theo category
+     */
+    public function countByCategory()
+    {
+        $sql = "SELECT c.name, COUNT(p.id) as count 
+                FROM {$this->table} p 
+                RIGHT JOIN categories c ON p.category_id = c.id 
+                GROUP BY c.id, c.name 
+                ORDER BY count DESC";
+        
+        $conn = $this->connect();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $data = [];
+        foreach ($results as $row) {
+            $data[$row['name']] = $row['count'];
+        }
+        return $data;
+    }
+
+    /**
+     * Đếm sản phẩm theo brand
+     */
+    public function countByBrand()
+    {
+        $sql = "SELECT b.name, COUNT(p.id) as count 
+                FROM {$this->table} p 
+                RIGHT JOIN brands b ON p.brand_id = b.id 
+                GROUP BY b.id, b.name 
+                ORDER BY count DESC";
+        
+        $conn = $this->connect();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $data = [];
+        foreach ($results as $row) {
+            $data[$row['name']] = $row['count'];
+        }
+        return $data;
+    }
 }

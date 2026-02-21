@@ -1,8 +1,8 @@
-@extends('layouts.master')
 
-@section('title', 'Admin Dashboard')
 
-@section('content')
+<?php $__env->startSection('title', 'Admin Dashboard'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
@@ -18,7 +18,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Sản phẩm</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['totalProducts'] ?? 0 }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo e($stats['totalProducts'] ?? 0); ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-box fa-2x text-gray-300"></i>
@@ -34,7 +34,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Danh mục</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['totalCategories'] ?? 0 }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo e($stats['totalCategories'] ?? 0); ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-list fa-2x text-gray-300"></i>
@@ -50,7 +50,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Thương hiệu</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['totalBrands'] ?? 0 }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo e($stats['totalBrands'] ?? 0); ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-tags fa-2x text-gray-300"></i>
@@ -66,7 +66,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Người dùng</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['totalUsers'] ?? 0 }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo e($stats['totalUsers'] ?? 0); ?></div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-users fa-2x text-gray-300"></i>
@@ -125,22 +125,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if(!empty($stats['recentProducts']))
-                                    @foreach($stats['recentProducts'] as $product)
+                                <?php if(!empty($stats['recentProducts'])): ?>
+                                    <?php $__currentLoopData = $stats['recentProducts']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <tr>
-                                        <td>{{ $product['id'] ?? 'N/A' }}</td>
-                                        <td>{{ $product['name'] ?? 'N/A' }}</td>
-                                        <td>{{ isset($product['price']) ? number_format($product['price'], 0, ',', '.') : 0 }} đ</td>
-                                        <td>{{ $product['category_name'] ?? 'N/A' }}</td>
-                                        <td>{{ $product['brand_name'] ?? 'N/A' }}</td>
-                                        <td>{{ $product['stock'] ?? 0 }}</td>
+                                        <td><?php echo e($product['id'] ?? 'N/A'); ?></td>
+                                        <td><?php echo e($product['name'] ?? 'N/A'); ?></td>
+                                        <td><?php echo e(isset($product['price']) ? number_format($product['price'], 0, ',', '.') : 0); ?> đ</td>
+                                        <td><?php echo e($product['category_name'] ?? 'N/A'); ?></td>
+                                        <td><?php echo e($product['brand_name'] ?? 'N/A'); ?></td>
+                                        <td><?php echo e($product['stock'] ?? 0); ?></td>
                                     </tr>
-                                    @endforeach
-                                @else
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php else: ?>
                                     <tr>
                                         <td colspan="6" class="text-center">Chưa có sản phẩm nào</td>
                                     </tr>
-                                @endif
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -164,11 +164,11 @@
     border-left: 0.25rem solid #f6c23e!important;
 }
 </style>
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3/dist/chart.min.js"></script>
 <script>
     // Chart sản phẩm theo danh mục
-    const categoryData = {!! json_encode($chartData['productsByCategory'] ?? []) !!};
+    const categoryData = <?php echo json_encode($chartData['productsByCategory'] ?? []); ?>;
     if (categoryData && Object.keys(categoryData).length > 0) {
         const ctxCategory = document.getElementById('categoryChart').getContext('2d');
         new Chart(ctxCategory, {
@@ -192,7 +192,7 @@
     }
 
     // Chart sản phẩm theo thương hiệu
-    const brandData = {!! json_encode($chartData['productsByBrand'] ?? []) !!};
+    const brandData = <?php echo json_encode($chartData['productsByBrand'] ?? []); ?>;
     if (brandData && Object.keys(brandData).length > 0) {
         const ctxBrand = document.getElementById('brandChart').getContext('2d');
         new Chart(ctxBrand, {
@@ -214,5 +214,6 @@
         });
     }
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Xamppp2\htdocs\hi\php2026\PHP2_MVC\app\views/admin/dashboard.blade.php ENDPATH**/ ?>

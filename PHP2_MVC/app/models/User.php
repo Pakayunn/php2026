@@ -117,4 +117,17 @@ class User extends Model
         $stmt->execute(['username' => $username]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Đếm tổng số người dùng
+     */
+    public function count()
+    {
+        $sql = "SELECT COUNT(*) as total FROM {$this->table}";
+        $conn = $this->connect();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'] ?? 0;
+    }
 }
