@@ -1,145 +1,123 @@
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Shop Home</title>
+@extends('layouts.master')
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+@section('title', $title ?? 'Trang chủ')
 
-<body class="bg-light">
+@section('content')
 
-@php
-    $user = $_SESSION['user'] ?? null;
-@endphp
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
-<div class="container">
-
-<a class="navbar-brand fw-semibold" href="/">DJI Hallo</a>
-
-<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
-    <span class="navbar-toggler-icon"></span>
-</button>
-
-<div id="nav" class="collapse navbar-collapse">
-
-<ul class="navbar-nav me-auto">
-    <li class="nav-item">
-        <a class="nav-link active" href="/">Home</a>
-    </li>
-</ul>
-
-<ul class="navbar-nav ms-auto">
-<li class="nav-item dropdown">
-
-<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-    <i class="fas fa-user"></i>
-    {{ $user['username'] ?? 'Tài khoản' }}
-</a>
-
-<ul class="dropdown-menu dropdown-menu-end">
-
-@if(!$user)
-
-    <li>
-        <a class="dropdown-item" href="/auth/login">
-            <i class="fas fa-sign-in-alt"></i> Đăng nhập
-        </a>
-    </li>
-
-    <li>
-        <a class="dropdown-item" href="/auth/register">
-            <i class="fas fa-user-plus"></i> Đăng ký
-        </a>
-    </li>
-
-@else
-
-    @if($user['role'] === 'admin')
-    <li>
-        <a class="dropdown-item" href="/admin/dashboard">
-            <i class="fas fa-tachometer-alt"></i> Dashboard
-        </a>
-    </li>
-    @endif
-
-    <li>
-        <a class="dropdown-item" href="/auth/logout">
-            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-        </a>
-    </li>
-
-@endif
-
-</ul>
-</li>
-</ul>
-
-</div>
-</div>
-</nav>
-
-<!-- Main -->
-<main class="container py-4">
 <div class="row g-4">
 
-<!-- Sidebar -->
-<aside class="col-12 col-lg-3">
-<div class="card shadow-sm">
-<div class="card-header bg-white fw-semibold">Categories</div>
-<div class="list-group list-group-flush">
-    <a href="#" class="list-group-item active">All</a>
-    <a href="#" class="list-group-item">Phones</a>
-    <a href="#" class="list-group-item">Laptops</a>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="col-12 col-lg-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">
+                Categories
+            </div>
+
+            <div class="list-group list-group-flush">
+
+                <a href="/" class="list-group-item active">
+                    All
+                </a>
+
+                @if(isset($categories))
+                    @foreach($categories as $category)
+                        <a href="/product/filterByCategory/{{ $category['id'] }}"
+                           class="list-group-item">
+                            {{ $category['name'] }}
+                        </a>
+                    @endforeach
+                @endif
+
+            </div>
+        </div>
+    </aside>
+
+
+    <!-- ===== PRODUCTS ===== -->
+    <section class="col-12 col-lg-9">
+
+        <h1 class="h4 mb-3">Products</h1>
+
+        <div class="row g-3">
+
+        @if(isset($products) && count($products) > 0)
+
+            @foreach($products as $product)
+
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="card h-100 shadow-sm">
+
+                    <!-- CLICK ẢNH → DETAIL -->
+                    <a href="/home/detail/{{ $product['id'] }}">
+                        @if(!empty($product['image']))
+                            <img src="/uploads/products/{{ $product['image'] }}"
+                                 class="card-img-top"
+                                 style="height:200px; object-fit:cover;">
+                        @else
+                            <img src="https://picsum.photos/600/400"
+                                 class="card-img-top"
+                                 style="height:200px; object-fit:cover;">
+                        @endif
+                    </a>
+
+                    <div class="card-body d-flex flex-column">
+
+                        <!-- CLICK TÊN → DETAIL -->
+                        <h5 class="card-title">
+                            <a href="/home/detail/{{ $product['id'] }}"
+                               class="text-decoration-none text-dark">
+                                {{ $product['name'] }}
+                            </a>
+                        </h5>
+
+                        <div class="fw-semibold text-danger mb-2">
+                            {{ number_format($product['price']) }} đ
+                        </div>
+
+                        <!-- Badge biến thể (chuẩn bị nâng cấp sau) -->
+                        @if(isset($product['has_variant']) && $product['has_variant'])
+                            <span class="badge bg-info mb-2">
+                                Có biến thể
+                            </span>
+                        @endif
+
+                        <div class="mt-auto d-grid gap-2">
+
+                            <a href="/home/detail/{{ $product['id'] }}"
+                               class="btn btn-sm btn-outline-dark">
+                                Xem chi tiết
+                            </a>
+
+                            @if($product['stock'] > 0)
+                                <a href="/cart/add/{{ $product['id'] }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                   Thêm vào giỏ
+                                </a>
+                            @else
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    Hết hàng
+                                </button>
+                            @endif
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            @endforeach
+
+        @else
+
+            <div class="alert alert-info">
+                Không có sản phẩm nào.
+            </div>
+
+        @endif
+
+        </div>
+    </section>
+
 </div>
-</div>
-</aside>
 
-<!-- Products -->
-<section class="col-12 col-lg-9">
-
-<h1 class="h4 mb-3">Products</h1>
-
-<div class="row g-3">
-
-@for($i = 1; $i <= 6; $i++)
-
-<div class="col-12 col-sm-6 col-xl-4">
-<div class="card h-100 shadow-sm">
-
-<img src="https://picsum.photos/600/400?random={{ $i }}" class="card-img-top">
-
-<div class="card-body">
-<h5 class="card-title">Sản phẩm {{ $i }}</h5>
-
-<div class="d-flex justify-content-between">
-    <div class="fw-semibold">$199</div>
-    <a href="#" class="btn btn-sm btn-outline-primary">View</a>
-</div>
-
-</div>
-</div>
-</div>
-
-@endfor
-
-</div>
-</section>
-
-</div>
-</main>
-
-<footer class="border-top bg-white">
-<div class="container py-3 text-center">
-© 2026 MyShop
-</div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+@endsection

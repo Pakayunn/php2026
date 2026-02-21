@@ -1,0 +1,1 @@
+<?php /**PATH C:\Xamppp2\htdocs\hi\php2026\PHP2_MVC\app\views/layouts/customer.blade.php ENDPATH**/ ?>
