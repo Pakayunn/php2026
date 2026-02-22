@@ -63,10 +63,10 @@ class Product extends Model
                 (name, price, category_id, brand_id, description, image, stock) 
                 VALUES 
                 (:name, :price, :category_id, :brand_id, :description, :image, :stock)";
-        
+
         $conn = $this->connect();
         $stmt = $conn->prepare($sql);
-        
+
         return $stmt->execute([
             'name' => $data['name'] ?? '',
             'price' => $data['price'] ?? 0,
@@ -92,10 +92,10 @@ class Product extends Model
                     image = :image, 
                     stock = :stock 
                 WHERE id = :id";
-        
+
         $conn = $this->connect();
         $stmt = $conn->prepare($sql);
-        
+
         return $stmt->execute([
             'name' => $data['name'] ?? '',
             'price' => $data['price'] ?? 0,
@@ -115,7 +115,7 @@ class Product extends Model
     {
         // Lấy thông tin sản phẩm để xóa ảnh
         $product = $this->find($id);
-        
+
         // Xóa file ảnh nếu có
         if ($product && !empty($product['image'])) {
             $imagePath = BASE_PATH . '/public/uploads/products/' . $product['image'];
@@ -123,7 +123,7 @@ class Product extends Model
                 unlink($imagePath);
             }
         }
-        
+
         // Xóa bản ghi trong database
         $sql = "DELETE FROM {$this->table} WHERE id = :id";
         $conn = $this->connect();
@@ -143,7 +143,7 @@ class Product extends Model
                 WHERE p.name LIKE :keyword 
                    OR p.description LIKE :keyword 
                 ORDER BY p.created_at DESC";
-        
+
         $conn = $this->connect();
         $stmt = $conn->prepare($sql);
         $stmt->execute(['keyword' => "%{$keyword}%"]);
@@ -161,7 +161,7 @@ class Product extends Model
                 LEFT JOIN brands b ON p.brand_id = b.id 
                 WHERE p.category_id = :category_id 
                 ORDER BY p.created_at DESC";
-        
+
         $conn = $this->connect();
         $stmt = $conn->prepare($sql);
         $stmt->execute(['category_id' => $categoryId]);
@@ -199,12 +199,12 @@ class Product extends Model
                 RIGHT JOIN categories c ON p.category_id = c.id 
                 GROUP BY c.id, c.name 
                 ORDER BY count DESC";
-        
+
         $conn = $this->connect();
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $data = [];
         foreach ($results as $row) {
             $data[$row['name']] = $row['count'];
@@ -222,16 +222,23 @@ class Product extends Model
                 RIGHT JOIN brands b ON p.brand_id = b.id 
                 GROUP BY b.id, b.name 
                 ORDER BY count DESC";
-        
+
         $conn = $this->connect();
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $data = [];
         foreach ($results as $row) {
             $data[$row['name']] = $row['count'];
         }
         return $data;
+    }
+    public function updateStock($productId, $newStock)
+    {
+        $pdo = $this->connect();
+
+        $stmt = $pdo->prepare("UPDATE products SET stock = ?, updated_at = NOW() WHERE id = ?");
+        return $stmt->execute([$newStock, $productId]);
     }
 }

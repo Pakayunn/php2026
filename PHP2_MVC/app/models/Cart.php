@@ -1,127 +1,152 @@
 <?php
-// app/models/Cart.php
 
 class Cart extends Model
 {
-    private $table = "cart";
-
     /**
-     * Lấy tất cả sản phẩm trong giỏ hàng của user
+     * ==========================================
+     * Tìm sản phẩm trong cart theo user + product
+     * ==========================================
      */
-    public function getCartByUserId($userId)
+    public function findByUserAndProduct($user_id, $product_id)
     {
-        $sql = "SELECT c.*, p.name, p.image, p.stock, p.status 
-                FROM {$this->table} c 
-                INNER JOIN products p ON c.product_id = p.id 
-                WHERE c.user_id = :user_id 
-                ORDER BY c.created_at DESC";
-        
         $conn = $this->connect();
-        $stmt = $conn->prepare($sql);
-        $stmt->execute(['user_id' => $userId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
-    /**
-     * Thêm sản phẩm vào giỏ hàng
-     */
-    public function addToCart($userId, $productId, $quantity, $price)
-    {
-        // Kiểm tra xem sản phẩm đã có trong giỏ chưa
-        $existing = $this->findByUserAndProduct($userId, $productId);
-        
-        if ($existing) {
-            // Nếu có rồi thì tăng số lượng
-            return $this->updateQuantity($existing['id'], $existing['quantity'] + $quantity);
-        } else {
-            // Nếu chưa có thì thêm mới
-            $sql = "INSERT INTO {$this->table} (user_id, product_id, quantity, price) 
-                    VALUES (:user_id, :product_id, :quantity, :price)";
-            
-            $conn = $this->connect();
-            $stmt = $conn->prepare($sql);
-            return $stmt->execute([
-                'user_id' => $userId,
-                'product_id' => $productId,
-                'quantity' => $quantity,
-                'price' => $price
-            ]);
-        }
-    }
+        $sql = "SELECT * FROM cart 
+                WHERE user_id = :user_id 
+                AND product_id = :product_id";
 
-    /**
-     * Tìm sản phẩm trong giỏ của user
-     */
-    public function findByUserAndProduct($userId, $productId)
-    {
-        $sql = "SELECT * FROM {$this->table} 
-                WHERE user_id = :user_id AND product_id = :product_id";
-        
-        $conn = $this->connect();
         $stmt = $conn->prepare($sql);
         $stmt->execute([
-            'user_id' => $userId,
-            'product_id' => $productId
+            ':user_id' => $user_id,
+            ':product_id' => $product_id
         ]);
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Cập nhật số lượng sản phẩm trong giỏ
+     * ==========================================
+     * Thêm sản phẩm vào cart
+     * ==========================================
      */
-    public function updateQuantity($cartId, $quantity)
+    public function insert($data)
     {
-        $sql = "UPDATE {$this->table} SET quantity = :quantity WHERE id = :id";
         $conn = $this->connect();
+
+        $sql = "INSERT INTO cart 
+                (user_id, product_id, quantity, price, created_at, updated_at)
+                VALUES (:user_id, :product_id, :quantity, :price, NOW(), NOW())";
+
         $stmt = $conn->prepare($sql);
+
         return $stmt->execute([
-            'quantity' => $quantity,
-            'id' => $cartId
+            ':user_id' => $data['user_id'],
+            ':product_id' => $data['product_id'],
+            ':quantity' => $data['quantity'],
+            ':price' => $data['price']
         ]);
     }
 
     /**
-     * Xóa sản phẩm khỏi giỏ hàng
+     * ==========================================
+     * Cập nhật số lượng
+     * ==========================================
      */
-    public function removeItem($cartId)
+    public function updateQuantity($id, $quantity)
     {
-        $sql = "DELETE FROM {$this->table} WHERE id = :id";
         $conn = $this->connect();
+
+        $sql = "UPDATE cart 
+                SET quantity = :quantity,
+                    updated_at = NOW()
+                WHERE id = :id";
+
         $stmt = $conn->prepare($sql);
-        return $stmt->execute(['id' => $cartId]);
+
+        return $stmt->execute([
+            ':quantity' => $quantity,
+            ':id' => $id
+        ]);
     }
 
     /**
-     * Xóa toàn bộ giỏ hàng của user
+     * ==========================================
+     * Lấy cart theo user (JOIN sản phẩm)
+     * ==========================================
      */
-    public function clearCart($userId)
+    public function getByUser($user_id)
     {
-        $sql = "DELETE FROM {$this->table} WHERE user_id = :user_id";
         $conn = $this->connect();
+
+        $sql = "SELECT c.*, p.name, p.image
+                FROM cart c
+                JOIN products p ON p.id = c.product_id
+                WHERE c.user_id = :user_id";
+
         $stmt = $conn->prepare($sql);
-        return $stmt->execute(['user_id' => $userId]);
+        $stmt->execute([
+            ':user_id' => $user_id
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Đếm số lượng sản phẩm trong giỏ
+     * ==========================================
+     * Xóa 1 sản phẩm khỏi cart
+     * ==========================================
      */
-    public function countItems($userId)
+    public function delete($id)
     {
-        $sql = "SELECT COUNT(*) as total FROM {$this->table} WHERE user_id = :user_id";
         $conn = $this->connect();
+
+        $sql = "DELETE FROM cart WHERE id = :id";
+
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['user_id' => $userId]);
+
+        return $stmt->execute([
+            ':id' => $id
+        ]);
+    }
+
+    /**
+     * ==========================================
+     * Đếm tổng quantity (badge)
+     * ==========================================
+     */
+    public function countByUser($user_id)
+    {
+        $conn = $this->connect();
+
+        $sql = "SELECT SUM(quantity) as total 
+                FROM cart 
+                WHERE user_id = :user_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':user_id' => $user_id
+        ]);
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
         return $result['total'] ?? 0;
     }
 
-    public function getTotalAmount($userId)
+    /**
+     * ==========================================
+     * Xóa toàn bộ cart (dùng cho checkout)
+     * ==========================================
+     */
+    public function clearCart($user_id)
     {
-        $sql = "SELECT SUM(quantity * price) as total FROM {$this->table} WHERE user_id = :user_id";
         $conn = $this->connect();
+
+        $sql = "DELETE FROM cart WHERE user_id = :user_id";
+
         $stmt = $conn->prepare($sql);
-        $stmt->execute(['user_id' => $userId]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['total'] ?? 0;
+
+        return $stmt->execute([
+            ':user_id' => $user_id
+        ]);
     }
 }
