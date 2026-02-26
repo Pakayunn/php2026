@@ -5,16 +5,27 @@ class ProductController extends Controller
     /**
      * Hiển thị danh sách sản phẩm
      */
-    public function index()
-    {
-        $productModel = $this->model('Product');
-        $products = $productModel->all();
-        
-        $this->view('product.index', [
-            'products' => $products,
-            'title' => 'Quản lý sản phẩm'
-        ]);
+   public function index()
+{
+    $productModel = $this->model('Product');
+    $wishlistModel = $this->model('Wishlist');
+
+    $products = $productModel->all();
+
+    if (isset($_SESSION['user'])) {
+        foreach ($products as &$product) {
+            $product['is_liked'] = $wishlistModel->isLiked(
+                $_SESSION['user']['id'],
+                $product['id']
+            );
+        }
     }
+
+    $this->view('product.index', [
+        'products' => $products,
+        'title' => 'Quản lý sản phẩm'
+    ]);
+}
 
     /**
      * Hiển thị form tạo sản phẩm mới
@@ -228,4 +239,33 @@ class ProductController extends Controller
         }
         exit;
     }
+    public function detail($id)
+{
+    $productModel = $this->model('Product');
+    $wishlistModel = $this->model('Wishlist');
+
+    $product = $productModel->find($id);
+
+    if (!$product) {
+        $_SESSION['error'] = 'Không tìm thấy sản phẩm!';
+        $this->redirect('/');
+        return;
+    }
+
+    // Mặc định chưa thích
+    $product['is_liked'] = false;
+
+    // Nếu đã đăng nhập thì kiểm tra
+    if (isset($_SESSION['user'])) {
+        $product['is_liked'] = $wishlistModel->isLiked(
+            $_SESSION['user']['id'],
+            $product['id']
+        );
+    }
+
+    $this->view('product.detail', [
+        'product' => $product,
+        'title' => $product['name']
+    ]);
+}
 }

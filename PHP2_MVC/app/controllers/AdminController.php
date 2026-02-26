@@ -7,6 +7,9 @@ class AdminController extends Controller
      */
     public function index()
     {
+        // Bảo vệ admin
+        Auth::checkAdmin();
+
         // Lấy thống kê
         $stats = $this->getStatistics();
         
@@ -25,16 +28,20 @@ class AdminController extends Controller
     private function getStatistics()
     {
         $productModel = $this->model('Product');
-        $categoryModel = $this->model('Category');
-        $brandModel = $this->model('Brand');
-        $userModel = $this->model('User');
 
         return [
-            'totalProducts' => $this->countRecords('products'),
+            'totalProducts'   => $this->countRecords('products'),
             'totalCategories' => $this->countRecords('categories'),
-            'totalBrands' => $this->countRecords('brands'),
-            'totalUsers' => $this->countRecords('users'),
-            'recentProducts' => $productModel->getRecent(5),
+            'totalBrands'     => $this->countRecords('brands'),
+            'totalUsers'      => $this->countRecords('users'),
+
+            // ===== THỐNG KÊ DOANH THU =====
+            'totalRevenue'    => $this->getTotalRevenue(),
+            'monthlyRevenue'  => $this->getMonthlyRevenue(),
+            'totalOrders'     => $this->getTotalOrders(),
+            'todayOrders'     => $this->getTodayOrders(),
+
+            'recentProducts'  => $productModel->getRecent(5),
         ];
     }
 
@@ -50,15 +57,91 @@ class AdminController extends Controller
     }
 
     /**
+     * ===== DOANH THU =====
+     */
+
+    // Tổng doanh thu
+    private function getTotalRevenue()
+    {
+        $conn = Database::connect();
+        $sql = "SELECT SUM(final_amount) 
+                FROM orders 
+                WHERE status = 'completed' 
+                AND payment_status = 'paid'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn() ?? 0;
+    }
+
+    // Doanh thu tháng hiện tại
+    private function getMonthlyRevenue()
+    {
+        $conn = Database::connect();
+        $sql = "SELECT SUM(final_amount) 
+                FROM orders 
+                WHERE status = 'completed' 
+                AND payment_status = 'paid'
+                AND MONTH(created_at) = MONTH(CURRENT_DATE())
+                AND YEAR(created_at) = YEAR(CURRENT_DATE())";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn() ?? 0;
+    }
+
+    // Tổng số đơn hoàn thành
+    private function getTotalOrders()
+    {
+        $conn = Database::connect();
+        $sql = "SELECT COUNT(*) 
+                FROM orders 
+                WHERE status = 'completed'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    // Đơn hàng hôm nay
+    private function getTodayOrders()
+    {
+        $conn = Database::connect();
+        $sql = "SELECT COUNT(*) 
+                FROM orders 
+                WHERE DATE(created_at) = CURRENT_DATE()";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    /**
      * Lấy dữ liệu cho biểu đồ
      */
     private function getChartData()
     {
         return [
             'productsByCategory' => $this->getProductsByCategory(),
-            'productsByBrand' => $this->getProductsByBrand(),
-            'usersByRole' => $this->getUsersByRole(),
+            'productsByBrand'    => $this->getProductsByBrand(),
+            'usersByRole'        => $this->getUsersByRole(),
+            'revenueByMonth'     => $this->getRevenueByMonth(),
+            'topProducts'        => $this->getTopProducts(),
         ];
+    }
+
+    /**
+     * Doanh thu theo tháng (biểu đồ)
+     */
+    private function getRevenueByMonth()
+    {
+        $conn = Database::connect();
+        $sql = "SELECT MONTH(created_at) as month,
+                       SUM(final_amount) as revenue
+                FROM orders
+                WHERE status = 'completed'
+                AND payment_status = 'paid'
+                GROUP BY MONTH(created_at)
+                ORDER BY MONTH(created_at)";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -105,11 +188,22 @@ class AdminController extends Controller
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    public function dashboard()
-    {
-        Auth::checkAdmin();
-        // Gọi index() để lấy dữ liệu thống kê
-        return $this->index();
-    }
 
+    /**
+     * Sản phẩm bán chạy
+     */
+    private function getTopProducts()
+    {
+        $conn = Database::connect();
+        $sql = "SELECT product_name,
+                       SUM(quantity) as total_sold,
+                       SUM(subtotal) as revenue
+                FROM order_items
+                GROUP BY product_id, product_name
+                ORDER BY total_sold DESC
+                LIMIT 5";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

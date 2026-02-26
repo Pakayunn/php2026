@@ -45,7 +45,18 @@
             @foreach($products as $product)
 
             <div class="col-12 col-sm-6 col-xl-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm position-relative">
+
+                    {{-- ===== WISHLIST BUTTON ===== --}}
+                    @if(isset($_SESSION['user']))
+                        <a href="/wishlist/add/{{ $product['id'] }}"
+                           class="btn btn-sm position-absolute top-0 end-0 m-2 
+                           {{ !empty($product['is_liked']) ? 'btn-danger' : 'btn-outline-danger' }}"
+                           style="z-index:2;">
+                            <i class="fas fa-heart"></i>
+                        </a>
+                    @endif
+
 
                     <!-- CLICK ẢNH → DETAIL -->
                     <a href="/home/detail/{{ $product['id'] }}">
@@ -74,7 +85,6 @@
                             {{ number_format($product['price']) }} đ
                         </div>
 
-                        <!-- Badge biến thể (chuẩn bị nâng cấp sau) -->
                         @if(isset($product['has_variant']) && $product['has_variant'])
                             <span class="badge bg-info mb-2">
                                 Có biến thể

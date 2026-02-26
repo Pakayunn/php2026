@@ -71,32 +71,48 @@ class OrdersController extends Controller
        ADMIN - Update trạng thái (AJAX)
     ========================== */
     public function updateStatus($id, $status)
-    {
-        if (empty($_SESSION['user'])) {
-            echo json_encode(['success' => false]);
-            return;
-        }
+{
+    if (empty($_SESSION['user'])) {
+        echo json_encode(['success' => false]);
+        return;
+    }
 
-        $allowed = ['pending', 'processing', 'completed', 'cancelled'];
+    $allowed = ['pending', 'processing', 'completed', 'cancelled'];
 
-        if (!in_array($status, $allowed)) {
-            echo json_encode(['success' => false]);
-            return;
-        }
+    if (!in_array($status, $allowed)) {
+        echo json_encode(['success' => false]);
+        return;
+    }
 
-        $pdo = Database::connect();
+    $pdo = Database::connect();
+
+    if ($status === 'completed') {
 
         $stmt = $pdo->prepare("
             UPDATE orders
-            SET status = ?, updated_at = NOW()
+            SET status = 'completed',
+                payment_status = 'paid',
+                updated_at = NOW()
+            WHERE id = ?
+        ");
+
+        $success = $stmt->execute([$id]);
+
+    } else {
+
+        $stmt = $pdo->prepare("
+            UPDATE orders
+            SET status = ?,
+                updated_at = NOW()
             WHERE id = ?
         ");
 
         $success = $stmt->execute([$status, $id]);
-
-        header('Content-Type: application/json');
-        echo json_encode(['success' => $success]);
     }
+
+    header('Content-Type: application/json');
+    echo json_encode(['success' => $success]);
+}
 
     /* ==========================
        USER - Trang checkout

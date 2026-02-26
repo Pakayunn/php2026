@@ -46,7 +46,18 @@
             <?php $__currentLoopData = $products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
             <div class="col-12 col-sm-6 col-xl-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card h-100 shadow-sm position-relative">
+
+                    
+                    <?php if(isset($_SESSION['user'])): ?>
+                        <a href="/wishlist/add/<?php echo e($product['id']); ?>"
+                           class="btn btn-sm position-absolute top-0 end-0 m-2 
+                           <?php echo e(!empty($product['is_liked']) ? 'btn-danger' : 'btn-outline-danger'); ?>"
+                           style="z-index:2;">
+                            <i class="fas fa-heart"></i>
+                        </a>
+                    <?php endif; ?>
+
 
                     <!-- CLICK ẢNH → DETAIL -->
                     <a href="/home/detail/<?php echo e($product['id']); ?>">
@@ -76,7 +87,6 @@
                             <?php echo e(number_format($product['price'])); ?> đ
                         </div>
 
-                        <!-- Badge biến thể (chuẩn bị nâng cấp sau) -->
                         <?php if(isset($product['has_variant']) && $product['has_variant']): ?>
                             <span class="badge bg-info mb-2">
                                 Có biến thể
