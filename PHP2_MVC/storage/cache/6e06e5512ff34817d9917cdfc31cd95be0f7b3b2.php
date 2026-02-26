@@ -10,83 +10,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
-<style>
-/* GIỮ NGUYÊN TOÀN BỘ CSS CỦA BẠN */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f8f9fa;
-}
-.navbar {
-    background: #ffffff !important;
-    border-bottom: 1px solid #eaeaea;
-}
-.navbar .nav-link {
-    color: #333 !important;
-}
-.navbar-brand {
-    font-weight: bold;
-    font-size: 1.4rem;
-    color: #0d6efd !important;
-}
-.sidebar {
-    min-height: 100vh;
-    background: #ffffff;
-    border-right: 1px solid #eaeaea;
-}
-.sidebar .nav-link {
-    color: #333;
-    padding: 12px 20px;
-    border-bottom: 1px solid #f1f1f1;
-}
-.sidebar .nav-link:hover {
-    background: #f1f5ff;
-    color: #0d6efd;
-}
-.sidebar .nav-link.active {
-    background: #0d6efd;
-    color: white;
-}
-.main-content {
-    padding: 24px;
-}
-.card {
-    border: none;
-    border-radius: 10px;
-    transition: all .2s ease;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-}
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,.08);
-}
-.card-img-top {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
-.btn-primary {
-    background: #0d6efd;
-    border: none;
-}
-.btn-outline-primary {
-    border-color: #0d6efd;
-    color: #0d6efd;
-}
-.btn-outline-primary:hover {
-    background: #0d6efd;
-    color: white;
-}
-.alert {
-    border-radius: 8px;
-}
-.dropdown-menu {
-    border-radius: 8px;
-    border: 1px solid #eaeaea;
-}
-.pagination .page-link {
-    border-radius: 6px;
-    margin: 0 2px;
-}
-</style>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; }
+        .navbar { background: #ffffff !important; border-bottom: 1px solid #eaeaea; }
+        .navbar .nav-link { color: #333 !important; }
+        .navbar-brand { font-weight: bold; font-size: 1.4rem; color: #0d6efd !important; }
+        .sidebar { min-height: 100vh; background: #ffffff; border-right: 1px solid #eaeaea; }
+        .sidebar .nav-link { color: #333; padding: 12px 20px; border-bottom: 1px solid #f1f1f1; }
+        .sidebar .nav-link:hover { background: #f1f5ff; color: #0d6efd; }
+        .sidebar .nav-link.active { background: #0d6efd; color: white; }
+        .main-content { padding: 24px; }
+        .card { border: none; border-radius: 10px; transition: all .2s ease; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.08); }
+        .btn-primary { background: #0d6efd; border: none; }
+        .btn-outline-primary { border-color: #0d6efd; color: #0d6efd; }
+        .btn-outline-primary:hover { background: #0d6efd; color: white; }
+        .alert { border-radius: 8px; }
+        .dropdown-menu { border-radius: 8px; border: 1px solid #eaeaea; }
+        .pagination .page-link { border-radius: 6px; margin: 0 2px; }
+    </style>
 </head>
 
 <body>
@@ -112,24 +54,22 @@ body {
                 </li>
             </ul>
 
+            <?php $user = $_SESSION['user'] ?? null; ?>
+
             <ul class="navbar-nav ms-auto">
 
                 
-                <?php
-                    $user = $_SESSION['user'] ?? null;
-                ?>
-
                 <?php if($user && $user['role'] !== 'admin'): ?>
                     <?php
                         $cartCount = 0;
                         try {
-                            if(isset($_SESSION['user']['id'])) {
+                            if (isset($user['id'])) {
                                 $pdo = \Database::connect();
                                 $stmt = $pdo->prepare("SELECT SUM(quantity) FROM carts WHERE user_id = ?");
-                                $stmt->execute([$_SESSION['user']['id']]);
+                                $stmt->execute([$user['id']]);
                                 $cartCount = $stmt->fetchColumn() ?? 0;
                             }
-                        } catch(Exception $e) {
+                        } catch (Exception $e) {
                             $cartCount = 0;
                         }
                     ?>
@@ -137,7 +77,6 @@ body {
                     <li class="nav-item position-relative me-3">
                         <a class="nav-link" href="/cart">
                             <i class="fas fa-shopping-cart fa-lg"></i>
-
                             <?php if($cartCount > 0): ?>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                     <?php echo e($cartCount); ?>
@@ -147,14 +86,9 @@ body {
                         </a>
                     </li>
                 <?php endif; ?>
+
                 
-
                 <li class="nav-item dropdown">
-
-                    <?php
-                        $user = $_SESSION['user'] ?? null;
-                    ?>
-
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                         <i class="fas fa-user"></i>
                         <?php echo e($user['username'] ?? 'Tài khoản'); ?>
@@ -162,33 +96,16 @@ body {
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-end">
-
                         <?php if(!$user): ?>
-                            <li>
-                                <a class="dropdown-item" href="/auth/login">
-                                    <i class="fas fa-sign-in"></i> Đăng nhập
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/auth/register">
-                                    <i class="fas fa-user-plus"></i> Đăng ký
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" href="/auth/login"><i class="fas fa-sign-in"></i> Đăng nhập</a></li>
+                            <li><a class="dropdown-item" href="/auth/register"><i class="fas fa-user-plus"></i> Đăng ký</a></li>
                         <?php else: ?>
                             <?php if($user['role'] === 'admin'): ?>
-                                <li>
-                                    <a class="dropdown-item" href="/admin/dashboard">
-                                        <i class="fas fa-tachometer-alt"></i> Trang Admin
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item" href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Trang Admin</a></li>
                             <?php endif; ?>
-                            <li>
-                                <a class="dropdown-item" href="/auth/logout">
-                                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" href="/orders/myOrders"><i class="fas fa-receipt"></i> Lịch sử đơn hàng</a></li>
+                            <li><a class="dropdown-item" href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
                         <?php endif; ?>
-
                     </ul>
                 </li>
 
@@ -198,46 +115,75 @@ body {
 </nav>
 
 
+<?php
+    $user = $_SESSION['user'] ?? null;
+    $uri = $_SERVER['REQUEST_URI'] ?? '';
+
+    $adminRoutes = [
+        '/admin',
+        '/product',
+        '/category',
+        '/brand',
+        '/user',
+        '/orders'
+    ];
+
+    $isAdminPage = false;
+
+    foreach ($adminRoutes as $route) {
+        if (strpos($uri, $route) === 0) {
+            $isAdminPage = true;
+            break;
+        }
+    }
+?>
+
 <div class="container-fluid">
     <div class="row">
-        <?php if(
-            strpos($_SERVER['REQUEST_URI'] ?? '', '/admin') !== false ||
-            strpos($_SERVER['REQUEST_URI'] ?? '', '/product') !== false ||
-            strpos($_SERVER['REQUEST_URI'] ?? '', '/category') !== false ||
-            strpos($_SERVER['REQUEST_URI'] ?? '', '/brand') !== false ||
-            strpos($_SERVER['REQUEST_URI'] ?? '', '/user') !== false ||
-            strpos($_SERVER['REQUEST_URI'] ?? '', '/orders') !== false
-        ): ?>
+
+        <?php if($user && $user['role'] === 'admin' && $isAdminPage): ?>
+
             <div class="col-md-2 p-0 sidebar">
                 <nav class="nav flex-column mt-3">
+
                     <a class="nav-link" href="/admin">
                         <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
+
                     <a class="nav-link" href="/product">
                         <i class="fas fa-box"></i> Sản phẩm
                     </a>
+
                     <a class="nav-link" href="/category">
                         <i class="fas fa-list"></i> Danh mục
                     </a>
+
                     <a class="nav-link" href="/brand">
                         <i class="fas fa-tags"></i> Thương hiệu
                     </a>
+
                     <a class="nav-link" href="/user">
                         <i class="fas fa-users"></i> Người dùng
                     </a>
+
                     <a class="nav-link" href="/orders">
-    <i class="fas fa-receipt"></i> Đơn hàng
-</a>
+                        <i class="fas fa-receipt"></i> Đơn hàng
+                    </a>
+
                 </nav>
             </div>
+
             <div class="col-md-10 main-content">
+
         <?php else: ?>
+
             <div class="col-12 main-content">
+
         <?php endif; ?>
 
-            <?php echo $__env->yieldContent('content'); ?>
+                <?php echo $__env->yieldContent('content'); ?>
 
-        </div>
+            </div>
     </div>
 </div>
 

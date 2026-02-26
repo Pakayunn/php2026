@@ -2,9 +2,9 @@
 
 class Order extends Model
 {
-    // ===============================
-    // CREATE (GIỮ NGUYÊN CODE CŨ)
-    // ===============================
+    /* =====================================================
+       CREATE ORDER
+       ===================================================== */
     public function create($data)
     {
         $conn = $this->connect();
@@ -37,9 +37,9 @@ class Order extends Model
     }
 
 
-    // ===============================
-    // LẤY TẤT CẢ ĐƠN (ADMIN)
-    // ===============================
+    /* =====================================================
+       GET ALL ORDERS (ADMIN)
+       ===================================================== */
     public function all()
     {
         $conn = $this->connect();
@@ -54,9 +54,9 @@ class Order extends Model
     }
 
 
-    // ===============================
-    // TÌM THEO ID
-    // ===============================
+    /* =====================================================
+       FIND ORDER BY ID
+       ===================================================== */
     public function find($id)
     {
         $conn = $this->connect();
@@ -73,9 +73,9 @@ class Order extends Model
     }
 
 
-    // ===============================
-    // LẤY ĐƠN THEO USER (TRANG USER)
-    // ===============================
+    /* =====================================================
+       GET ORDERS BY USER (USER PAGE)
+       ===================================================== */
     public function getByUser($userId)
     {
         $conn = $this->connect();
@@ -93,9 +93,9 @@ class Order extends Model
     }
 
 
-    // ===============================
-    // UPDATE STATUS (ADMIN)
-    // ===============================
+    /* =====================================================
+       UPDATE ORDER STATUS (ADMIN)
+       ===================================================== */
     public function updateStatus($id, $status)
     {
         $conn = $this->connect();
@@ -110,9 +110,9 @@ class Order extends Model
     }
 
 
-    // ===============================
-    // UPDATE PAYMENT STATUS
-    // ===============================
+    /* =====================================================
+       UPDATE PAYMENT STATUS
+       ===================================================== */
     public function updatePaymentStatus($id, $paymentStatus)
     {
         $conn = $this->connect();
@@ -127,9 +127,9 @@ class Order extends Model
     }
 
 
-    // ===============================
-    // THỐNG KÊ DOANH THU (BASIC)
-    // ===============================
+    /* =====================================================
+       TOTAL REVENUE (COMPLETED ORDERS)
+       ===================================================== */
     public function getTotalRevenue()
     {
         $conn = $this->connect();
@@ -146,9 +146,9 @@ class Order extends Model
     }
 
 
-    // ===============================
-    // ĐẾM SỐ ĐƠN THEO STATUS
-    // ===============================
+    /* =====================================================
+       COUNT ORDERS BY STATUS
+       ===================================================== */
     public function countByStatus($status)
     {
         $conn = $this->connect();
@@ -165,4 +165,13 @@ class Order extends Model
 
         return $result['total'] ?? 0;
     }
+    public function getOrderItems($orderId)
+{
+    $sql = "SELECT oi.*, p.name as product_name 
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id = ?";
+
+    return $this->query($sql, [$orderId]);
+}
 }

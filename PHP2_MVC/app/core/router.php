@@ -17,11 +17,11 @@ class Router
         // Tách URL thành segments
         $segments = $path === '' ? [] : explode('/', $path);
 
-        // Xác định controller
+        // Mặc định: controller = home
         $controllerSegment = $segments[0] ?? 'home';
         $controllerName = ucfirst($controllerSegment) . 'Controller';
 
-        // Xác định action
+        // Mặc định: action = index
         $action = $segments[1] ?? 'index';
 
         // Các tham số còn lại
@@ -41,11 +41,10 @@ class Router
             return;
         }
 
-        // Gọi controller action
+        // Gọi controller action với params
         call_user_func_array([$controller, $action], $params);
     }
 
-    // Lấy base path (trường hợp project nằm trong thư mục con)
     public function basePath(): string
     {
         $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
@@ -54,7 +53,6 @@ class Router
         return $dir === '.' ? '' : $dir;
     }
 
-    // Trang 404
     public function notFound(string $message = ''): void
     {
         http_response_code(404);
