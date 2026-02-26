@@ -38,7 +38,7 @@
                                 <td>{{ $product['id'] }}</td>
                                 <td>
                                     @if(!empty($product['image']))
-                                        <img src="/uploads/products/{{ $product['image'] }}" 
+                                       <img src="/uploads/products/{{ $product['image'] }}" 
                                              alt="{{ $product['name'] }}" 
                                              class="img-thumbnail" 
                                              style="max-width: 60px; height: auto;">

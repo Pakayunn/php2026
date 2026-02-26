@@ -126,34 +126,35 @@
                 <?php $user = $_SESSION['user'] ?? null; ?>
 
                 <ul class="navbar-nav ms-auto">
+                    
+                    <?php if($user && $user['role'] !== 'admin'): ?>
+                        <?php
+                            $wishlistCount = 0;
+                            try {
+                                if (isset($user['id'])) {
+                                    $pdo = \Database::connect();
+                                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM wishlist WHERE user_id = ?");
+                                    $stmt->execute([$user['id']]);
+                                    $wishlistCount = $stmt->fetchColumn() ?? 0;
+                                }
+                            } catch (Exception $e) {
+                                $wishlistCount = 0;
+                            }
+                        ?>
 
-<?php if($user && $user['role'] !== 'admin'): ?>
-    <?php
-        $wishlistCount = 0;
-        try {
-            if (isset($user['id'])) {
-                $pdo = \Database::connect();
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM wishlist WHERE user_id = ?");
-                $stmt->execute([$user['id']]);
-                $wishlistCount = $stmt->fetchColumn() ?? 0;
-            }
-        } catch (Exception $e) {
-            $wishlistCount = 0;
-        }
-    ?>
+                        <li class="nav-item position-relative me-3">
+                            <a class="nav-link" href="/wishlist">
+                                <i class="fas fa-heart fa-lg text-danger"></i>
+                                <?php if($wishlistCount > 0): ?>
+                                    <span
+                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                        <?php echo e($wishlistCount); ?>
 
-    <li class="nav-item position-relative me-3">
-        <a class="nav-link" href="/wishlist">
-            <i class="fas fa-heart fa-lg text-danger"></i>
-            <?php if($wishlistCount > 0): ?>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    <?php echo e($wishlistCount); ?>
-
-                </span>
-            <?php endif; ?>
-        </a>
-    </li>
-<?php endif; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
                     
                     <?php if($user && $user['role'] !== 'admin'): ?>
                         <?php
@@ -298,7 +299,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <?php echo $__env->yieldContent('scripts'); ?>
-<?php echo $__env->yieldPushContent('scripts'); ?>
+        <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
 
 </html><?php /**PATH C:\Xamppp2\htdocs\hi\php2026\PHP2_MVC\app\views/layouts/master.blade.php ENDPATH**/ ?>

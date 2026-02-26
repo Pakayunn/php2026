@@ -38,7 +38,7 @@
                                 <td><?php echo e($product['id']); ?></td>
                                 <td>
                                     <?php if(!empty($product['image'])): ?>
-                                        <img src="/uploads/products/<?php echo e($product['image']); ?>" 
+                                       <img src="/uploads/products/<?php echo e($product['image']); ?>" 
                                              alt="<?php echo e($product['name']); ?>" 
                                              class="img-thumbnail" 
                                              style="max-width: 60px; height: auto;">

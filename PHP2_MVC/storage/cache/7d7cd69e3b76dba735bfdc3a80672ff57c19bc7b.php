@@ -156,4 +156,4 @@ function previewImage(input) {
 }
 </script>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Xamppp2\htdocs\Php2\PHP2_MVC\app\views/product/edit.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Xamppp2\htdocs\hi\php2026\PHP2_MVC\app\views/product/edit.blade.php ENDPATH**/ ?>
