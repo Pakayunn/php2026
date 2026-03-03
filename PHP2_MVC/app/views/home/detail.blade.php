@@ -3,12 +3,12 @@
 @section('content')
 
 <div class="container mt-5">
+
     <div class="row">
 
         <!-- ẢNH -->
         <div class="col-md-6 position-relative">
 
-            {{-- NÚT WISHLIST --}}
             @if(isset($_SESSION['user']))
                 <a href="/wishlist/add/{{ $product['id'] }}"
                    class="btn position-absolute top-0 end-0 m-2 
@@ -18,11 +18,16 @@
                 </a>
             @endif
 
-            <img src="{{ $product['image'] ?? 'https://via.placeholder.com/500x400' }}"
-                 class="img-fluid rounded shadow-sm"
-                 style="width:100%; object-fit:cover;">
+            @if(!empty($product['image']))
+                <img src="/uploads/products/{{ $product['image'] }}"
+                     class="img-fluid"
+                     style="height:550px; object-fit:cover;">
+            @else
+                <img src="https://picsum.photos/600/400"
+                     class="img-fluid"
+                     style="height:550px; object-fit:cover;">
+            @endif
         </div>
-
 
         <!-- THÔNG TIN -->
         <div class="col-md-6">
@@ -37,8 +42,7 @@
                 {{ $product['description'] ?? '' }}
             </p>
 
-
-            <!-- ===== BIẾN THỂ CỨNG ===== -->
+            <!-- BIẾN THỂ -->
             <div class="mb-3">
                 <label class="form-label fw-semibold">Chọn màu:</label>
                 <select class="form-select" name="variant_color">
@@ -56,8 +60,7 @@
                 </select>
             </div>
 
-
-            <!-- ===== NÚT HÀNH ĐỘNG ===== -->
+            <!-- NÚT HÀNH ĐỘNG -->
             <div class="mt-4 d-flex gap-2">
 
                 @if($product['stock'] > 0)
@@ -79,7 +82,59 @@
             </div>
 
         </div>
+
     </div>
+
+    <!-- ================= RELATED PRODUCTS ================= -->
+
+    <hr class="my-5">
+
+    <h4 class="mb-4">Sản phẩm liên quan</h4>
+
+    <div class="row">
+        @forelse(($relatedProducts ?? []) as $item)
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow-sm">
+
+                    <a href="/shop/detail/{{ $item['id'] }}">
+                        @if(!empty($item['image']))
+                            <img src="/uploads/products/{{ $item['image'] }}"
+                                 class="card-img-top"
+                                 style="height:250px; object-fit:cover;">
+                        @else
+                            <img src="https://picsum.photos/400/300"
+                                 class="card-img-top"
+                                 style="height:250px; object-fit:cover;">
+                        @endif
+                    </a>
+
+                    <div class="card-body text-center">
+                        <h6 class="card-title">
+                            <a href="/shop/detail/{{ $item['id'] }}"
+                               class="text-decoration-none text-dark">
+                                {{ $item['name'] }}
+                            </a>
+                        </h6>
+
+                        <p class="text-danger fw-bold">
+                            {{ number_format($item['price']) }} VNĐ
+                        </p>
+
+                        <a href="/shop/detail/{{ $item['id'] }}"
+                           class="btn btn-sm btn-outline-primary">
+                            Xem chi tiết
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        @empty
+            <div class="col-12">
+                <p>Không có sản phẩm liên quan.</p>
+            </div>
+        @endforelse
+    </div>
+
 </div>
 
 @endsection

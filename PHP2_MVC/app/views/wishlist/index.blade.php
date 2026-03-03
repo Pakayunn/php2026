@@ -22,9 +22,16 @@
 
                         {{-- ẢNH --}}
                         <a href="/product/detail/{{ $item['id'] }}">
-                            <img src="{{ $item['image'] ?? 'https://via.placeholder.com/300x300' }}"
-                                 class="card-img-top"
-                                 style="height:220px; object-fit:cover;">
+                            @if (!empty($item['image']))
+                                <img src="/uploads/products/{{ $item['image'] }}"
+                                     class="card-img-top"
+                                     style="height:220px; object-fit:cover;">
+                            @else
+                                <img src="https://via.placeholder.com/300x300"
+                                     class="card-img-top"
+                                     style="height:220px; object-fit:cover;">
+                            @endif
+                            
                         </a>
 
                         <div class="card-body d-flex flex-column">

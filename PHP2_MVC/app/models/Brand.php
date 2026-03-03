@@ -54,7 +54,7 @@ class Brand extends Model
 
         // Xóa file logo nếu có
         if ($brand && !empty($brand['logo'])) {
-            $logoPath = BASE_PATH . '/public/uploads/brands/' . $brand['logo'];
+            $logoPath = BASE_PATH . '/app/public/uploads/brands/' . $brand['logo'];
             if (file_exists($logoPath)) {
                 unlink($logoPath);
             }

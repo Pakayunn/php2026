@@ -88,7 +88,7 @@ class CategoryController extends Controller
 
         $categoryModel = $this->model('Category');
         
-        if ($categoryModel->update($_POST, $id)) {
+        if ($categoryModel->update( $id, $_POST )) {
             $_SESSION['success'] = 'Cập nhật danh mục thành công!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra!';

@@ -21,7 +21,10 @@ class BrandController extends Controller
     }
 
     public function store()
+    
     {
+
+        
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('brand');
             return;
@@ -42,12 +45,13 @@ class BrandController extends Controller
         // Xử lý upload logo
         $logoName = null;
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = BASE_PATH . '/public/uploads/brands/';
+            $uploadDir = BASE_PATH . '/app/public/uploads/brands/';
             $upload = new Upload($uploadDir);
             $upload->setAllowedTypes(['jpg', 'jpeg', 'png'])
                    ->setMaxSize(2097152);
 
             $logoName = $upload->upload($_FILES['logo']);
+            
             
             if ($upload->hasErrors()) {
                 $_SESSION['errors']['logo'] = $upload->firstError();
@@ -71,6 +75,7 @@ class BrandController extends Controller
         }
 
         $this->redirect('brand');
+
     }
 
     public function edit($id)
@@ -96,7 +101,7 @@ class BrandController extends Controller
             $this->redirect('/brand');
             return;
         }
-
+    
         $brandModel = $this->model('Brand');
         $brand = $brandModel->find($id);
 
@@ -122,7 +127,7 @@ class BrandController extends Controller
         $logoName = $brand['logo'];
         
         if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = BASE_PATH . '/public/uploads/brands/';
+            $uploadDir = BASE_PATH . '/app/public/uploads/brands/';
             $upload = new Upload($uploadDir);
             $upload->setAllowedTypes(['jpg', 'jpeg', 'png'])
                    ->setMaxSize(2097152);
@@ -153,7 +158,7 @@ class BrandController extends Controller
             'logo' => $logoName
         ];
         
-        if ($brandModel->update($data, $id)) {
+        if ($brandModel->update($id, $data)) {
             $_SESSION['success'] = 'Cập nhật thương hiệu thành công!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra!';

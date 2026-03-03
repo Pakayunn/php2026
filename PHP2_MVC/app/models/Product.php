@@ -241,4 +241,126 @@ class Product extends Model
         $stmt = $pdo->prepare("UPDATE products SET stock = ?, updated_at = NOW() WHERE id = ?");
         return $stmt->execute([$newStock, $productId]);
     }
+        /**
+     * Lấy sản phẩm liên quan (không ảnh hưởng code cũ)
+     */
+    public function getRelated($categoryId, $currentId, $limit = 4)
+{
+    $conn = $this->connect();
+
+    $sql = "SELECT p.*, c.name as category_name, b.name as brand_name 
+            FROM {$this->table} p 
+            LEFT JOIN categories c ON p.category_id = c.id 
+            LEFT JOIN brands b ON p.brand_id = b.id 
+            WHERE p.category_id = ?
+            AND p.id != ?
+            ORDER BY p.created_at DESC
+            LIMIT $limit";   // bỏ bind LIMIT
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$categoryId, $currentId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+public function getRandomExcept($productId, $limit = 4)
+{
+    $conn = $this->connect();
+
+    $sql = "SELECT *
+            FROM {$this->table}
+            WHERE id != ?
+            ORDER BY RAND()
+            LIMIT $limit";   // bỏ bind LIMIT
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$productId]);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function filterAdvanced($filters = [])
+{
+    $conn = $this->connect();
+
+    $sql = "SELECT p.*, c.name as category_name, b.name as brand_name 
+            FROM {$this->table} p
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN brands b ON p.brand_id = b.id
+            WHERE 1=1";
+
+    $params = [];
+
+    // Lọc theo category
+    if (!empty($filters['category_id'])) {
+        $sql .= " AND p.category_id = :category_id";
+        $params[':category_id'] = $filters['category_id'];
+    }
+
+    // Lọc theo brand
+    if (!empty($filters['brand_id'])) {
+        $sql .= " AND p.brand_id = :brand_id";
+        $params[':brand_id'] = $filters['brand_id'];
+    }
+
+    // Lọc theo giá tối thiểu
+    if (!empty($filters['min'])) {
+        $sql .= " AND p.price >= :min";
+        $params[':min'] = $filters['min'];
+    }
+
+    // Lọc theo giá tối đa
+    if (!empty($filters['max'])) {
+        $sql .= " AND p.price <= :max";
+        $params[':max'] = $filters['max'];
+    }
+
+    // Tìm theo từ khóa
+    if (!empty($filters['keyword'])) {
+        $sql .= " AND (p.name LIKE :keyword OR p.description LIKE :keyword)";
+        $params[':keyword'] = "%" . $filters['keyword'] . "%";
+    }
+
+    // Sắp xếp
+    if (!empty($filters['sort'])) {
+        switch ($filters['sort']) {
+            case 'price_asc':
+                $sql .= " ORDER BY p.price ASC";
+                break;
+            case 'price_desc':
+                $sql .= " ORDER BY p.price DESC";
+                break;
+            case 'newest':
+                $sql .= " ORDER BY p.created_at DESC";
+                break;
+            default:
+                $sql .= " ORDER BY p.created_at DESC";
+        }
+    } else {
+        $sql .= " ORDER BY p.created_at DESC";
+    }
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute($params);
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function paginate($limit, $offset)
+{
+    $sql = "SELECT p.*, c.name as category_name, b.name as brand_name 
+            FROM {$this->table} p
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN brands b ON p.brand_id = b.id
+            ORDER BY p.created_at DESC
+            LIMIT :limit OFFSET :offset";
+
+    $conn = $this->connect();
+    $stmt = $conn->prepare($sql);
+
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

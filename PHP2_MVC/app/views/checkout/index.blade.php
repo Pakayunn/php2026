@@ -19,7 +19,7 @@
                 @foreach($items as $item)
                 <div style="display:flex;align-items:center;border-bottom:1px solid #eee;padding:15px 0;gap:15px;">
 
-                    <img src="/uploads/{{ $item['image'] }}" width="70" style="border-radius:6px;">
+                    <img src="/uploads/products/{{ $item['image'] }}" width="70" style="border-radius:6px;">
 
                     <div style="flex:1;">
                         <strong>{{ $item['name'] }}</strong><br>

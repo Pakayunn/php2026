@@ -198,7 +198,7 @@
                                         ký</a></li>
                             @else
                                 @if($user['role'] === 'admin')
-                                    <li><a class="dropdown-item" href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i>
+                                    <li><a class="dropdown-item" href="/admin"><i class="fas fa-tachometer-alt"></i>
                                             Trang Admin</a></li>
                                 @endif
                                 <li><a class="dropdown-item" href="/orders/myOrders"><i class="fas fa-receipt"></i> Lịch sử

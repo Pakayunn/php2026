@@ -37,7 +37,61 @@
     <section class="col-12 col-lg-9">
 
         <h1 class="h4 mb-3">Products</h1>
+        <form method="GET" action="/shop" class="card card-body mb-4 shadow-sm">
+    <div class="row g-2">
 
+        <!-- Tìm kiếm -->
+        <div class="col-12 col-md-3">
+            <input type="text"
+                   name="keyword"
+                   value="{{ $_GET['keyword'] ?? '' }}"
+                   class="form-control"
+                   placeholder="Tìm sản phẩm...">
+        </div>
+
+        <!-- Giá từ -->
+        <div class="col-6 col-md-2">
+            <input type="number"
+                   name="min"
+                   value="{{ $_GET['min'] ?? '' }}"
+                   class="form-control"
+                   placeholder="Giá từ">
+        </div>
+
+        <!-- Giá đến -->
+        <div class="col-6 col-md-2">
+            <input type="number"
+                   name="max"
+                   value="{{ $_GET['max'] ?? '' }}"
+                   class="form-control"
+                   placeholder="Giá đến">
+        </div>
+
+        <!-- Sắp xếp -->
+        <div class="col-12 col-md-3">
+            <select name="sort" class="form-select">
+                <option value="">Sắp xếp</option>
+                <option value="newest" {{ ($_GET['sort'] ?? '') == 'newest' ? 'selected' : '' }}>
+                    Mới nhất
+                </option>
+                <option value="price_asc" {{ ($_GET['sort'] ?? '') == 'price_asc' ? 'selected' : '' }}>
+                    Giá tăng dần
+                </option>
+                <option value="price_desc" {{ ($_GET['sort'] ?? '') == 'price_desc' ? 'selected' : '' }}>
+                    Giá giảm dần
+                </option>
+            </select>
+        </div>
+
+        <!-- Button -->
+        <div class="col-12 col-md-2 d-grid">
+            <button class="btn btn-dark">
+                Lọc
+            </button>
+        </div>
+
+    </div>
+</form>
         <div class="row g-3">
 
         @if(isset($products) && count($products) > 0)
@@ -124,6 +178,38 @@
             </div>
 
         @endif
+        @if(isset($totalPages) && $totalPages > 1)
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+
+        {{-- Previous --}}
+        <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
+            <a class="page-link" 
+               href="?page={{ $currentPage - 1 }}">
+                Previous
+            </a>
+        </li>
+
+        {{-- Number Pages --}}
+        @for($i = 1; $i <= $totalPages; $i++)
+            <li class="page-item {{ $i == $currentPage ? 'active' : '' }}">
+                <a class="page-link" href="?page={{ $i }}">
+                    {{ $i }}
+                </a>
+            </li>
+        @endfor
+
+        {{-- Next --}}
+        <li class="page-item {{ $currentPage >= $totalPages ? 'disabled' : '' }}">
+            <a class="page-link" 
+               href="?page={{ $currentPage + 1 }}">
+                Next
+            </a>
+        </li>
+
+    </ul>
+</nav>
+@endif
 
         </div>
     </section>
